@@ -93,7 +93,7 @@ export default function ChatBPage() {
         {/* Messages */}
         <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {messages.map((msg, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start", gap: 10 }}>
+            <div key={`${msg.timestamp.getTime()}-${i}`} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start", gap: 10 }}>
               {msg.role === "assistant" && (
                 <div style={{ width: 32, height: 32, borderRadius: 9, background: "#1B1F5A", display: "grid", placeItems: "center", fontSize: 14, flexShrink: 0, alignSelf: "flex-end" }}>🤖</div>
               )}
