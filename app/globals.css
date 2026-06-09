@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, monospace;
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #C9A227;
+  color: #070920;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.15s; }
+.d3 { animation-delay: 0.25s; }
+.d4 { animation-delay: 0.38s; }
+.d5 { animation-delay: 0.5s; }
+
+.spinner {
+  width: 17px;
+  height: 17px;
+  border: 2.5px solid rgba(12, 14, 42, 0.3);
+  border-top-color: #0C0E2A;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.spinner-light {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #313861;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6B72C9;
+}
