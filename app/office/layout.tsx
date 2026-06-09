@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { getToken } from "@/lib/auth";
+import { getToken, getRole } from "@/lib/auth";
 import {
   Home,
   FileText,
@@ -13,11 +13,11 @@ import {
   RefreshCw,
   BarChart2,
   Settings,
-  HelpCircle,
   Bell,
   ChevronDown,
   Plus,
   Search,
+  LayoutDashboard,
 } from "lucide-react";
 
 const navItems = [
@@ -34,11 +34,11 @@ export default function OfficeLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
   const [userInitials, setUserInitials] = useState("AC");
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) {
-      router.push("/auth");
-    }
+    if (!getToken()) { router.push("/auth"); return; }
+    setIsOwner(getRole() === "owner");
   }, [router]);
 
   return (
@@ -107,6 +107,33 @@ export default function OfficeLayout({ children }: { children: React.ReactNode }
             Nueva Solución
           </Link>
         </div>
+
+        {/* Admin console — solo para owner */}
+        {isOwner && (
+          <Link
+            href="/admin"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 13,
+              padding: "11px 12px",
+              borderRadius: 11,
+              color: pathname === "/admin" ? "#fff" : "#9094AC",
+              fontSize: 14.5,
+              fontWeight: pathname === "/admin" ? 600 : 500,
+              transition: ".15s",
+              background: pathname === "/admin" ? "#1B1F5A" : "transparent",
+              marginBottom: 2,
+              marginTop: 8,
+              textDecoration: "none",
+              borderTop: "1px solid #EAECF4",
+              paddingTop: 14,
+            }}
+          >
+            <LayoutDashboard size={18} style={{ opacity: 0.7, flexShrink: 0 }} />
+            Consola Admin
+          </Link>
+        )}
 
         {/* Help */}
         <div style={{ marginTop: "auto" }}>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getToken } from "@/lib/auth";
+import { getToken, getRole } from "@/lib/auth";
 import { Search, Bell, HelpCircle, ChevronDown } from "lucide-react";
 
 const navItems = [
@@ -38,7 +38,8 @@ export default function AdminPage() {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    if (!getToken()) router.push("/auth");
+    if (!getToken()) { router.push("/auth"); return; }
+    if (getRole() !== "owner") { router.push("/office"); return; }
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, [router]);

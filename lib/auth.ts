@@ -27,6 +27,11 @@ export function getOrgId(): string | null {
   return localStorage.getItem(AUTH_KEYS.orgId);
 }
 
+export function getRole(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(AUTH_KEYS.role);
+}
+
 export function getBotId(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(AUTH_KEYS.botId);
