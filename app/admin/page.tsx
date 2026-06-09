@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { getToken, getRole } from "@/lib/auth";
-import { Search, Bell, HelpCircle, ChevronDown } from "lucide-react";
+import { getAdminKey, setAdminKey, clearAdminKey } from "@/lib/auth";
+import { Search, Bell, HelpCircle, ChevronDown, Eye, EyeOff, LogOut, Key } from "lucide-react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 const navItems = [
   { icon: "■", label: "Resumen", active: true },
@@ -31,20 +32,179 @@ const KPI_DATA = [
   { icon: "💰", label: "Costo LLM estimado", value: "$142.68", delta: "▲ 9% vs ayer", type: "up" },
 ];
 
+async function validateAdminKey(key: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/admin/organizations`, {
+      headers: { "x-admin-key": key },
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+function LoginScreen({
+  onSuccess,
+}: {
+  onSuccess: (key: string) => void;
+}) {
+  const [keyInput, setKeyInput] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!keyInput.trim()) return;
+    setSubmitting(true);
+    setError("");
+    const valid = await validateAdminKey(keyInput.trim());
+    if (valid) {
+      setAdminKey(keyInput.trim());
+      onSuccess(keyInput.trim());
+    } else {
+      setError("Clave incorrecta o servidor no disponible.");
+    }
+    setSubmitting(false);
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0A0C24", display: "grid", placeItems: "center", fontFamily: "var(--font-inter), system-ui, sans-serif", WebkitFontSmoothing: "antialiased" }}>
+      <div style={{ width: "100%", maxWidth: 400, padding: "0 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 16 }}>
+            <Image src="/logo.png" alt="Nodematik" width={40} height={40} style={{ objectFit: "contain" }} />
+            <span style={{ fontWeight: 800, fontSize: 24, letterSpacing: "-0.03em", color: "#fff" }}>Nodematik</span>
+          </div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,162,39,.12)", border: "1px solid rgba(201,162,39,.3)", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "#C9A227", letterSpacing: ".06em", textTransform: "uppercase" }}>
+            Admin Console
+          </div>
+        </div>
+
+        <div style={{ background: "#11142F", border: "1px solid #222746", borderRadius: 18, padding: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#1B1F42", display: "grid", placeItems: "center" }}>
+              <Key size={16} color="#C9A227" />
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#EEF0FA", lineHeight: 1.2 }}>Acceso de administrador</div>
+              <div style={{ fontSize: 12, color: "#6E739A", marginTop: 2 }}>Solo para el administrador de la plataforma</div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#A7ACCB", marginBottom: 8, letterSpacing: ".02em" }}>
+              Admin API Key
+            </label>
+            <div style={{ position: "relative", marginBottom: error ? 12 : 20 }}>
+              <input
+                type={showKey ? "text" : "password"}
+                value={keyInput}
+                onChange={e => setKeyInput(e.target.value)}
+                placeholder="Introduce la clave de administrador"
+                autoComplete="off"
+                autoFocus
+                style={{
+                  width: "100%",
+                  background: "#0E1130",
+                  border: `1px solid ${error ? "#FF6B6B" : "#2E3458"}`,
+                  borderRadius: 11,
+                  padding: "13px 46px 13px 16px",
+                  fontFamily: "monospace",
+                  fontSize: 14,
+                  color: "#EEF0FA",
+                  outline: "none",
+                  boxSizing: "border-box",
+                  letterSpacing: showKey ? "normal" : ".1em",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(v => !v)}
+                style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 2, color: "#6E739A", display: "flex" }}
+              >
+                {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+
+            {error && (
+              <div style={{ fontSize: 12.5, color: "#FF6B6B", marginBottom: 16, display: "flex", alignItems: "center", gap: 7 }}>
+                <span>⚠</span> {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting || !keyInput.trim()}
+              style={{
+                width: "100%",
+                padding: "13px 20px",
+                borderRadius: 11,
+                border: "none",
+                background: submitting || !keyInput.trim() ? "#1B1F42" : "#C9A227",
+                color: submitting || !keyInput.trim() ? "#6E739A" : "#070920",
+                fontWeight: 700,
+                fontSize: 14.5,
+                cursor: submitting || !keyInput.trim() ? "default" : "pointer",
+                fontFamily: "inherit",
+                transition: ".15s",
+              }}
+            >
+              {submitting ? "Verificando..." : "Entrar a la consola"}
+            </button>
+          </form>
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 12, color: "#3A3F5C", marginTop: 24 }}>
+          Acceso restringido · Nodematik Platform © 2026
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
-  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [env, setEnv] = useState<"Producción" | "Staging">("Producción");
   const [envMenuOpen, setEnvMenuOpen] = useState(false);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    if (!getToken()) { router.push("/auth"); return; }
-    if (getRole() !== "owner") { router.push("/office"); return; }
+    const stored = getAdminKey();
+    if (stored) {
+      validateAdminKey(stored).then(valid => {
+        if (valid) setAuthenticated(true);
+        else clearAdminKey();
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!authenticated) return;
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
-  }, [router]);
+  }, [authenticated]);
 
-  const s = (v: string) => ({ style: v });
+  function handleLogout() {
+    clearAdminKey();
+    setAuthenticated(false);
+  }
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#0A0C24", display: "grid", placeItems: "center", fontFamily: "system-ui" }}>
+        <span style={{ color: "#6E739A", fontSize: 14 }}>Verificando sesión...</span>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return <LoginScreen onSuccess={() => setAuthenticated(true)} />;
+  }
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "230px 1fr", minHeight: "100vh", fontFamily: "var(--font-inter), system-ui, sans-serif", fontSize: 14, WebkitFontSmoothing: "antialiased", background: "#0A0C24", color: "#EEF0FA" }}>
@@ -81,8 +241,12 @@ export default function AdminPage() {
           </button>
         ))}
         <div style={{ marginTop: "auto", borderTop: "1px solid #222746", paddingTop: 8 }}>
-          <button style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 13px", color: "#6E739A", fontSize: 13, fontWeight: 500, background: "none", border: "none", width: "100%", cursor: "pointer", fontFamily: "inherit" }}>
-            ◀ Colapsar
+          <button
+            onClick={handleLogout}
+            style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 13px", color: "#FF6B6B", fontSize: 13, fontWeight: 600, background: "none", border: "none", width: "100%", cursor: "pointer", fontFamily: "inherit", borderRadius: 8, transition: ".15s" }}
+          >
+            <LogOut size={14} />
+            Cerrar sesión
           </button>
         </div>
       </aside>

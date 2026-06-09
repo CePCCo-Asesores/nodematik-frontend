@@ -32,6 +32,24 @@ export function getRole(): string | null {
   return localStorage.getItem(AUTH_KEYS.role);
 }
 
+// Admin platform key — stored in sessionStorage (clears on tab close)
+const ADMIN_KEY = "nm_admin_key";
+
+export function getAdminKey(): string | null {
+  if (typeof window === "undefined") return null;
+  return sessionStorage.getItem(ADMIN_KEY);
+}
+
+export function setAdminKey(key: string): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(ADMIN_KEY, key);
+}
+
+export function clearAdminKey(): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(ADMIN_KEY);
+}
+
 export function getBotId(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(AUTH_KEYS.botId);
