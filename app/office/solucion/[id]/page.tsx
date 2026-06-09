@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MessageSquare, CheckCircle, XCircle } from "lucide-react";
-import { getSolicitud } from "@/lib/api";
+import { getSolicitud, responderSolicitud } from "@/lib/api";
 import type { Solicitud } from "@/lib/types";
 
 export default function SolucionDetailPage() {
@@ -13,7 +13,8 @@ export default function SolucionDetailPage() {
   const id = params.id as string;
   const [solicitud, setSolicitud] = useState<Solicitud | null>(null);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; ok: boolean } | null>(null);
+  const [acting, setActing] = useState<"approve" | "reject" | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -36,9 +37,26 @@ export default function SolucionDetailPage() {
     load();
   }, [id]);
 
-  function showToast(msg: string) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2600);
+  function showToast(text: string, ok: boolean) {
+    setToast({ text, ok });
+    setTimeout(() => setToast(null), 2800);
+  }
+
+  async function handleAction(type: "approve" | "reject") {
+    if (!solicitud) return;
+    setActing(type);
+    try {
+      const respuesta = type === "approve"
+        ? "Apruebo esta solución. Por favor actívala."
+        : "Rechaza esta propuesta. No procede.";
+      await responderSolicitud(solicitud.id, respuesta);
+      showToast(type === "approve" ? "Solución aprobada y activada" : "Solicitud rechazada", type === "approve");
+      setSolicitud((prev) => prev ? { ...prev, estado: type === "approve" ? "operando" : "paused" } : prev);
+    } catch {
+      showToast("No se pudo procesar. Intenta de nuevo.", false);
+    } finally {
+      setActing(null);
+    }
   }
 
   if (loading) {
@@ -115,16 +133,20 @@ export default function SolucionDetailPage() {
               <p style={{ fontSize: 13.5, color: "#54586F", lineHeight: 1.5, marginBottom: 18 }}>Revisa la propuesta y decide si activarla. Ninguna solución opera sin tu aprobación.</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <button
-                  onClick={() => showToast("Solución aprobada y activada")}
-                  style={{ padding: 12, borderRadius: 10, fontWeight: 600, fontSize: 13.5, border: "none", background: "#C9A227", color: "#070920", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  onClick={() => handleAction("approve")}
+                  disabled={acting !== null}
+                  style={{ padding: 12, borderRadius: 10, fontWeight: 600, fontSize: 13.5, border: "none", background: "#C9A227", color: "#070920", cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.65 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "inherit" }}
                 >
-                  <CheckCircle size={15} /> Aprobar
+                  {acting === "approve" ? <div style={{ width: 14, height: 14, border: "2px solid rgba(7,9,32,.3)", borderTopColor: "#070920", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : <CheckCircle size={15} />}
+                  Aprobar
                 </button>
                 <button
-                  onClick={() => showToast("Solución rechazada")}
-                  style={{ padding: 12, borderRadius: 10, fontWeight: 600, fontSize: 13.5, border: "1px solid #DCDFEC", background: "#fff", color: "#FF6B6B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  onClick={() => handleAction("reject")}
+                  disabled={acting !== null}
+                  style={{ padding: 12, borderRadius: 10, fontWeight: 600, fontSize: 13.5, border: "1px solid #DCDFEC", background: "#fff", color: "#FF6B6B", cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.65 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontFamily: "inherit" }}
                 >
-                  <XCircle size={15} /> Rechazar
+                  {acting === "reject" ? <div style={{ width: 14, height: 14, border: "2px solid rgba(255,107,107,.3)", borderTopColor: "#FF6B6B", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : <XCircle size={15} />}
+                  Rechazar
                 </button>
               </div>
             </div>
@@ -150,10 +172,11 @@ export default function SolucionDetailPage() {
 
       {toast && (
         <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "#12153D", color: "#fff", padding: "12px 20px", borderRadius: 11, fontSize: 14, fontWeight: 500, zIndex: 200, display: "flex", alignItems: "center", gap: 9 }}>
-          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
-          {toast}
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: toast.ok ? "#34D17F" : "#FF6B6B", display: "inline-block" }} />
+          {toast.text}
         </div>
       )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

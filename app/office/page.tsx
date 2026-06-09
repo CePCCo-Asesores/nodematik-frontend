@@ -210,7 +210,7 @@ export default function OfficePage() {
               <span style={{ width: 26, height: 26, borderRadius: 8, background: "#EEF0FB", display: "grid", placeItems: "center", fontSize: 13 }}><Zap size={13} color="#252A78" /></span>
               Soluciones activas
             </h3>
-            <a href="#" style={{ fontSize: 13.5, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todas →</a>
+            <Link href="/office/soluciones" style={{ fontSize: 13.5, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todas →</Link>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(232px,1fr))", gap: 16, marginBottom: 32 }}>
             {soluciones.map((sol) => (
@@ -265,7 +265,7 @@ export default function OfficePage() {
                 Aprobaciones pendientes
                 <span style={{ fontSize: 11, fontWeight: 700, background: "#C9A227", color: "#070920", minWidth: 20, height: 20, borderRadius: 7, display: "grid", placeItems: "center", padding: "0 5px" }}>2</span>
               </h3>
-              <a href="#" style={{ color: "#9094AC", textDecoration: "none", fontSize: 16 }}>→</a>
+              <Link href="/office/aprobaciones" style={{ color: "#9094AC", textDecoration: "none", fontSize: 16 }}>→</Link>
             </div>
             <div style={{ margin: "0 16px 16px", border: "1px solid #DCDFEC", borderRadius: 14, padding: 16, background: "#FAFBFE" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 11 }}>
@@ -292,7 +292,7 @@ export default function OfficePage() {
               </div>
             </div>
             <div style={{ padding: "0 20px 18px" }}>
-              <a href="#" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todas las aprobaciones →</a>
+              <Link href="/office/aprobaciones" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todas las aprobaciones →</Link>
             </div>
           </div>
 
@@ -300,7 +300,7 @@ export default function OfficePage() {
           <div style={{ background: "#FFFFFF", border: "1px solid #EAECF4", borderRadius: 22, boxShadow: "0 2px 10px rgba(20,22,46,.05)", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px 14px" }}>
               <h3 style={{ fontSize: 15.5, fontWeight: 700, color: "#1B1F5A" }}>Resultados recientes</h3>
-              <a href="#" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todos →</a>
+              <Link href="/office/resultados" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ver todos →</Link>
             </div>
             {[
               { icon: "🛡", title: "Alerta de reputación", sub: "3 menciones detectadas sobre tu marca", time: "hace 18 min" },
@@ -318,7 +318,7 @@ export default function OfficePage() {
               </div>
             ))}
             <div style={{ padding: "14px 20px 18px", borderTop: "1px solid #EAECF4" }}>
-              <a href="#" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ir a resultados →</a>
+              <Link href="/office/resultados" style={{ fontSize: 13, color: "#2D3480", fontWeight: 600, textDecoration: "none" }}>Ir a resultados →</Link>
             </div>
           </div>
         </div>
