@@ -23,9 +23,7 @@ export default function LoopsPage() {
   const fetchData = useCallback(async () => {
     try {
       const solicitudes = await getSolicitudes();
-      const activas: Solicitud[] = (solicitudes ?? []).filter((s) =>
-        ["operando", "ok", "esperando_aprobacion", "pending", "construyendo", "procesando"].includes(s.estado)
-      );
+      const activas: Solicitud[] = (solicitudes ?? []).filter((s) => !!s.loopId);
       // Enrich with loop data where available
       const rows: LoopRow[] = await Promise.all(
         activas.map(async (s) => {
@@ -33,7 +31,7 @@ export default function LoopsPage() {
             const loop = await getLoop(s.id) as { id?: string; estado?: string; proxima?: string; fallos?: number };
             return {
               id: loop?.id ?? s.id,
-              nombre: s.nombre || s.pregunta?.slice(0, 50) || "Loop",
+              nombre: s.nombre || s.problema?.slice(0, 50) || "Loop",
               estado: loop?.estado === "pausado" ? "pausado" : loop?.estado === "error" ? "error" : "activo",
               proxima: loop?.proxima,
               fallos: loop?.fallos ?? 0,
@@ -42,7 +40,7 @@ export default function LoopsPage() {
           } catch {
             return {
               id: s.id,
-              nombre: s.nombre || s.pregunta?.slice(0, 50) || "Solución",
+              nombre: s.nombre || s.problema?.slice(0, 50) || "Solución",
               estado: ["operando", "ok"].includes(s.estado) ? "activo" : "pausado",
               fallos: 0,
               solicitudId: s.id,

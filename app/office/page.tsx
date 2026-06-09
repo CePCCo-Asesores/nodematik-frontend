@@ -142,7 +142,7 @@ export default function OfficePage() {
       if (data && data.length > 0) {
         const mapped: SolucionCard[] = data.map((s: Solicitud) => ({
           id: s.id,
-          nombre: s.nombre || s.pregunta?.slice(0, 40) || "Solución",
+          nombre: s.nombre || s.problema?.slice(0, 40) || "Solución",
           icon: "⚡",
           estado: mapEstado(s.estado),
           rl: "Último estado",

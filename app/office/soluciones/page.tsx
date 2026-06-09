@@ -16,11 +16,11 @@ const FILTER_LABELS: Record<Filter, string> = {
 };
 
 function mapEstado(estado: string): "ok" | "pending" | "building" | "done" | "paused" | "error" {
-  if (["operando", "ok"].includes(estado)) return "ok";
+  if (["aprobado", "operando", "ok"].includes(estado)) return "ok";
   if (["esperando_aprobacion", "pending"].includes(estado)) return "pending";
-  if (["construyendo", "building", "procesando", "pendiente"].includes(estado)) return "building";
+  if (["construyendo", "building", "procesando", "pendiente", "esperando_respuesta"].includes(estado)) return "building";
   if (["lista", "done", "completado"].includes(estado)) return "done";
-  if (["error"].includes(estado)) return "error";
+  if (["rechazado", "error"].includes(estado)) return "error";
   return "paused";
 }
 
@@ -167,8 +167,8 @@ export default function SolucionesPage() {
                 </div>
                 {/* Name */}
                 <div style={{ fontWeight: 700, fontSize: 15, color: "#1B1F5A", lineHeight: 1.3, marginBottom: 10, minHeight: 42 }}>
-                  {s.nombre || s.pregunta?.slice(0, 55) || "Solución"}
-                  {(s.pregunta?.length ?? 0) > 55 && "…"}
+                  {s.nombre || s.problema?.slice(0, 55) || "Solución"}
+                  {(s.problema?.length ?? 0) > 55 && "…"}
                 </div>
                 {/* Status */}
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 14 }}>

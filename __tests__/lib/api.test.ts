@@ -134,24 +134,26 @@ describe("getSolicitud()", () => {
 });
 
 describe("crearSolicitud()", () => {
-  it("POSTs pregunta to /admin/operador/solicitudes", async () => {
-    mockOk({ id: "s-new", estado: "pendiente", pregunta: "Nueva" });
+  it("POSTs botId+problema to /admin/operador/solicitudes", async () => {
+    mockOk({ id: "s-new", estado: "pendiente", respuesta: "Primera pregunta" });
     await crearSolicitud("¿Cuál es el plazo?");
 
     const [url, opts] = mockFetch.mock.calls[0];
     expect(url).toMatch(/\/admin\/operador\/solicitudes$/);
     expect(opts.method).toBe("POST");
-    expect(JSON.parse(opts.body)).toEqual({ pregunta: "¿Cuál es el plazo?" });
+    const body = JSON.parse(opts.body);
+    expect(body.problema).toBe("¿Cuál es el plazo?");
+    expect(body).toHaveProperty("botId");
   });
 });
 
 describe("responderSolicitud()", () => {
-  it("POSTs respuesta to /admin/operador/solicitudes/:id/responder", async () => {
-    mockOk({ id: "s-1", estado: "completado", pregunta: "Q", respuesta: "A" });
+  it("POSTs mensaje to /admin/operador/solicitudes/:id/responder", async () => {
+    mockOk({ id: "s-1", estado: "completado", problema: "Q", respuesta: "A" });
     await responderSolicitud("s-1", "Mi respuesta");
 
     const [url, opts] = mockFetch.mock.calls[0];
     expect(url).toMatch(/\/admin\/operador\/solicitudes\/s-1\/responder$/);
-    expect(JSON.parse(opts.body)).toEqual({ respuesta: "Mi respuesta" });
+    expect(JSON.parse(opts.body)).toEqual({ mensaje: "Mi respuesta" });
   });
 });

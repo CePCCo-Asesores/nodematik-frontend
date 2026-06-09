@@ -27,12 +27,14 @@ export interface Bot {
 export interface Solicitud {
   id: string;
   estado: string;
-  pregunta: string;
+  problema: string;
   respuesta?: string;
   siguiente?: string;
   createdAt?: string;
   updatedAt?: string;
   nombre?: string;
+  skillId?: string;
+  loopId?: string;
 }
 
 export interface SolicitudFull extends Solicitud {

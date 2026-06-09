@@ -1,4 +1,4 @@
-import { getToken } from "./auth";
+import { getToken, getBotId } from "./auth";
 import type {
   LoginResponse,
   RegisterResponse,
@@ -89,9 +89,10 @@ export async function getSolicitud(id: string): Promise<Solicitud> {
 }
 
 export async function crearSolicitud(pregunta: string): Promise<Solicitud> {
+  const botId = getBotId() ?? "";
   return fetchApi<Solicitud>("/admin/operador/solicitudes", {
     method: "POST",
-    body: JSON.stringify({ pregunta }),
+    body: JSON.stringify({ botId, problema: pregunta }),
   });
 }
 
@@ -101,7 +102,18 @@ export async function responderSolicitud(
 ): Promise<Solicitud> {
   return fetchApi<Solicitud>(`/admin/operador/solicitudes/${id}/responder`, {
     method: "POST",
-    body: JSON.stringify({ respuesta }),
+    body: JSON.stringify({ mensaje: respuesta }),
+  });
+}
+
+// Aprobaciones de solicitudes (one-time skills)
+export async function aprobacionSolicitud(
+  id: string,
+  aprobado: boolean
+): Promise<{ ok: boolean; accion: string; skillId?: string }> {
+  return fetchApi(`/admin/operador/solicitudes/${id}/aprobaciones`, {
+    method: "POST",
+    body: JSON.stringify({ aprobado }),
   });
 }
 
@@ -110,14 +122,14 @@ export async function getLoop(loopId: string) {
   return fetchApi(`/admin/operador/loops/${loopId}`);
 }
 
-// Aprobaciones
+// Aprobaciones de loops (continuous solutions)
 export async function postAprobacion(
   loopId: string,
   payload: { ok: boolean; accion: string }
 ) {
   return fetchApi(`/admin/operador/loops/${loopId}/aprobaciones`, {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ aprobado: payload.ok }),
   });
 }
 
@@ -129,6 +141,6 @@ export async function chatWithBot(
 ): Promise<ChatResponse> {
   return fetchApi<ChatResponse>(`/admin/bots/${botId}/chat`, {
     method: "POST",
-    body: JSON.stringify({ message, conversationId }),
+    body: JSON.stringify({ mensaje: message, conversationId }),
   });
 }

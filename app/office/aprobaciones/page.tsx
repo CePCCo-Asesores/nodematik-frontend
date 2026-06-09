@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getSolicitudes, responderSolicitud } from "@/lib/api";
+import { getSolicitudes, aprobacionSolicitud } from "@/lib/api";
 import type { Solicitud } from "@/lib/types";
 import { CheckCircle, XCircle, ExternalLink, RefreshCw } from "lucide-react";
 
@@ -40,10 +40,7 @@ export default function AprobacionesPage() {
   async function handleAction(sol: Solicitud, type: "approve" | "reject") {
     setPending({ id: sol.id, type });
     try {
-      const respuesta = type === "approve"
-        ? "Apruebo esta solución. Por favor actívala."
-        : "Rechaza esta propuesta. No procede.";
-      await responderSolicitud(sol.id, respuesta);
+      await aprobacionSolicitud(sol.id, type === "approve");
       showToast(
         type === "approve" ? "Solución aprobada y activada" : "Solución rechazada",
         type === "approve"
@@ -105,7 +102,7 @@ export default function AprobacionesPage() {
                     <span style={{ fontSize: 11.5, color: "#9094AC", fontFamily: "monospace" }}>ID: {sol.id.slice(0, 16)}…</span>
                   </div>
                   <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1B1F5A", letterSpacing: "-0.02em" }}>
-                    {sol.nombre || sol.pregunta?.slice(0, 80) || "Solución propuesta"}
+                    {sol.nombre || sol.problema?.slice(0, 80) || "Solución propuesta"}
                   </h2>
                   {sol.createdAt && (
                     <p style={{ fontSize: 12.5, color: "#9094AC", marginTop: 4, fontFamily: "monospace" }}>
@@ -126,7 +123,7 @@ export default function AprobacionesPage() {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 11, fontFamily: "monospace", color: "#9094AC", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Descripción del problema</div>
                   <p style={{ fontSize: 14.5, color: "#14162E", lineHeight: 1.6, background: "#F7F8FC", border: "1px solid #EAECF4", borderRadius: 12, padding: "14px 16px" }}>
-                    {sol.pregunta}
+                    {sol.problema}
                   </p>
                 </div>
                 {sol.respuesta && (

@@ -18,15 +18,18 @@ const TAB_LABELS: Record<Tab, string> = {
 
 const ESTADO_DISPLAY: Record<string, { label: string; color: string; bg: string }> = {
   pendiente:             { label: "Pendiente",            color: "#3B6FC4", bg: "#E9F0FB" },
+  esperando_respuesta:   { label: "En conversación",      color: "#3B6FC4", bg: "#E9F0FB" },
   procesando:            { label: "Procesando",           color: "#3B6FC4", bg: "#E9F0FB" },
   construyendo:          { label: "Construyendo",         color: "#3B6FC4", bg: "#E9F0FB" },
   esperando_aprobacion:  { label: "Esperando aprobación", color: "#C8911A", bg: "#FBF3DC" },
   pending:               { label: "Esperando aprobación", color: "#C8911A", bg: "#FBF3DC" },
+  aprobado:              { label: "Aprobada",             color: "#1F9D57", bg: "#EAF7F0" },
   operando:              { label: "Operando",             color: "#1F9D57", bg: "#EAF7F0" },
   ok:                    { label: "Operando",             color: "#1F9D57", bg: "#EAF7F0" },
   lista:                 { label: "Lista",                color: "#2D3480", bg: "#EEF0FB" },
   done:                  { label: "Lista",                color: "#2D3480", bg: "#EEF0FB" },
   completado:            { label: "Completada",           color: "#2D3480", bg: "#EEF0FB" },
+  rechazado:             { label: "Rechazada",            color: "#D94F4F", bg: "#FDE9E9" },
   error:                 { label: "Error",                color: "#D94F4F", bg: "#FDE9E9" },
 };
 
@@ -36,9 +39,9 @@ function estadoStyle(estado: string) {
 
 function matchTab(s: Solicitud, tab: Tab) {
   if (tab === "todas") return true;
-  if (tab === "proceso") return ["pendiente", "procesando", "construyendo"].includes(s.estado);
+  if (tab === "proceso") return ["pendiente", "esperando_respuesta", "procesando", "construyendo"].includes(s.estado);
   if (tab === "aprobacion") return ["esperando_aprobacion", "pending"].includes(s.estado);
-  if (tab === "completadas") return ["lista", "done", "completado", "operando", "ok"].includes(s.estado);
+  if (tab === "completadas") return ["lista", "done", "completado", "aprobado", "rechazado", "operando", "ok"].includes(s.estado);
   return true;
 }
 
@@ -76,7 +79,7 @@ export default function SolicitudesPage() {
     const q = query.toLowerCase();
     return (
       s.id.toLowerCase().includes(q) ||
-      s.pregunta?.toLowerCase().includes(q) ||
+      s.problema?.toLowerCase().includes(q) ||
       s.nombre?.toLowerCase().includes(q) ||
       s.estado.toLowerCase().includes(q)
     );
@@ -197,8 +200,8 @@ export default function SolicitudesPage() {
                 {/* Name */}
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14.5, color: "#1B1F5A", marginBottom: 3 }}>
-                    {s.nombre || s.pregunta?.slice(0, 60) || "Solicitud"}
-                    {(s.pregunta?.length ?? 0) > 60 && "…"}
+                    {s.nombre || s.problema?.slice(0, 60) || "Solicitud"}
+                    {(s.problema?.length ?? 0) > 60 && "…"}
                   </div>
                   <div style={{ fontSize: 11.5, color: "#9094AC", fontFamily: "monospace" }}>ID: {s.id.slice(0, 16)}…</div>
                 </div>

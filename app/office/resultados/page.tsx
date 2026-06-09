@@ -32,7 +32,7 @@ export default function ResultadosPage() {
     try {
       const all = await getSolicitudes();
       const done = (all ?? []).filter((s) =>
-        ["lista", "done", "completado", "operando", "ok"].includes(s.estado)
+        ["lista", "done", "completado", "aprobado", "operando", "ok"].includes(s.estado)
       );
       // Most recent first
       done.sort((a, b) => {
@@ -103,8 +103,8 @@ export default function ResultadosPage() {
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1B1F5A", letterSpacing: "-0.01em" }}>
-                    {s.nombre || s.pregunta?.slice(0, 70) || "Solución"}
-                    {(s.pregunta?.length ?? 0) > 70 && "…"}
+                    {s.nombre || s.problema?.slice(0, 70) || "Solución"}
+                    {(s.problema?.length ?? 0) > 70 && "…"}
                   </h3>
                   <span style={{ fontSize: 11, fontWeight: 700, background: "#EAF7F0", color: "#1F9D57", padding: "3px 9px", borderRadius: 6 }}>
                     Completada
@@ -113,7 +113,7 @@ export default function ResultadosPage() {
                 {/* Problem */}
                 <p style={{ fontSize: 13.5, color: "#54586F", marginBottom: s.respuesta ? 12 : 0, lineHeight: 1.5 }}>
                   <span style={{ fontWeight: 600, color: "#9094AC" }}>Problema: </span>
-                  {s.pregunta}
+                  {s.problema}
                 </p>
                 {/* Result */}
                 {s.respuesta && (

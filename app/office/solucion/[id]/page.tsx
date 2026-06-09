@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, MessageSquare, CheckCircle, XCircle } from "lucide-react";
-import { getSolicitud, responderSolicitud } from "@/lib/api";
+import { getSolicitud, aprobacionSolicitud } from "@/lib/api";
 import type { Solicitud } from "@/lib/types";
 
 export default function SolucionDetailPage() {
@@ -26,7 +26,7 @@ export default function SolucionDetailPage() {
         setSolicitud({
           id,
           estado: "esperando_aprobacion",
-          pregunta: "Monitoreo de menciones de marca en redes sociales",
+          problema: "Monitoreo de menciones de marca en redes sociales",
           respuesta: "He diseñado una solución de monitoreo continuo que vigila X, LinkedIn, Instagram y TikTok cada 15 minutos, generando alertas y resúmenes diarios automatizados.",
           nombre: "Vigilancia de marca",
         });
@@ -46,12 +46,9 @@ export default function SolucionDetailPage() {
     if (!solicitud) return;
     setActing(type);
     try {
-      const respuesta = type === "approve"
-        ? "Apruebo esta solución. Por favor actívala."
-        : "Rechaza esta propuesta. No procede.";
-      await responderSolicitud(solicitud.id, respuesta);
+      await aprobacionSolicitud(solicitud.id, type === "approve");
       showToast(type === "approve" ? "Solución aprobada y activada" : "Solicitud rechazada", type === "approve");
-      setSolicitud((prev) => prev ? { ...prev, estado: type === "approve" ? "operando" : "paused" } : prev);
+      setSolicitud((prev) => prev ? { ...prev, estado: type === "approve" ? "aprobado" : "rechazado" } : prev);
     } catch {
       showToast("No se pudo procesar. Intenta de nuevo.", false);
     } finally {
@@ -80,7 +77,7 @@ export default function SolucionDetailPage() {
           <ArrowLeft size={14} /> Mi Oficina
         </Link>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1B1F5A", letterSpacing: "-0.03em" }}>{solicitud.nombre || solicitud.pregunta}</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1B1F5A", letterSpacing: "-0.03em" }}>{solicitud.nombre || solicitud.problema}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
             <span style={{ fontFamily: "monospace", fontSize: 12, color: "#9094AC" }}>ID: {solicitud.id}</span>
             <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#DCDFEC", display: "inline-block" }} />
@@ -99,7 +96,7 @@ export default function SolucionDetailPage() {
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1B1F5A", marginBottom: 16 }}>Propuesta de solución</h2>
             <div style={{ background: "#F7F8FC", border: "1px solid #EAECF4", borderRadius: 14, padding: 20 }}>
               <div style={{ fontSize: 11, fontFamily: "monospace", color: "#9094AC", textTransform: "uppercase" as const, letterSpacing: ".06em", marginBottom: 8 }}>Descripción del problema</div>
-              <p style={{ fontSize: 15, color: "#14162E", fontWeight: 500, lineHeight: 1.6 }}>{solicitud.pregunta}</p>
+              <p style={{ fontSize: 15, color: "#14162E", fontWeight: 500, lineHeight: 1.6 }}>{solicitud.problema}</p>
             </div>
             {solicitud.respuesta && (
               <div style={{ marginTop: 16, background: "#EEF0FB", border: "1px solid #C6CAEE", borderRadius: 14, padding: 20 }}>
